@@ -27,20 +27,19 @@ public class OldRSABreaker {
 	}
 
 	public BigInteger getD() { 
-		//TO-DO
-		return BigInteger.ZERO;
+		return gcd(e,getPhi())[1];
 	}
 
 	public BigInteger decryptMessage() {
-		//TO-DO
-		return BigInteger.ZERO;
+		
+		return BigInteger.valueOf(encryptedMessage).pow(getD().intValue()).mod((BigInteger.valueOf(n)));
 	}
 
 	public Pair sieve() {
 		int upperBoundSquareRoot = (int) Math.sqrt(n);
 
 		boolean[] isComposite = new boolean[n + 1];
-		
+
 		for (int m = 2; m <= upperBoundSquareRoot; m++) {
 
 			if (!isComposite[m]) {
@@ -53,29 +52,41 @@ public class OldRSABreaker {
 
 		}
 
-		for (int i = 0; i< isComposite.length; i++) {
-			if (!isComposite[i]) {
-				for (int j = 0; j< isComposite.length; j++) {
-					if (!isComposite[j] && i*j == n) {
-						Pair p = new Pair(i, j);
-						return p;
-
-
-					}
-
+		for (int i = 2; i< isComposite.length; i++) {
+			if (!isComposite[i] && (n%i) == 0) {
+				int j = n/i;
+				if(!isComposite[j]) {
+					Pair p = new Pair(i, j);
+					return p;
 				}
+
 			}
+
 		}
+
+
 		return null;
 	}
+	
+	static BigInteger[] gcd(BigInteger p, BigInteger q) {
+	      if (q.compareTo(BigInteger.ZERO ) ==0)
+	         return new BigInteger[] { p, BigInteger.ONE, BigInteger.ZERO };
+
+	      BigInteger[] vals = gcd(q, p.mod(q));
+	      BigInteger d = vals[0];
+	      BigInteger a = vals[2];
+	      BigInteger b = vals[1].subtract((p.divide(q)).multiply(vals[2]));
+	      return new BigInteger[] { d, a, b };
+	   }
 
 
 
-	public static void main(String[] args) {
-		OldRSABreaker rsa = new OldRSABreaker();
-		rsa.setE(BigInteger.valueOf(5524331));
-		rsa.setN(1177662719);
-		System.out.println(rsa.getPhi());
-	}
+
+//	public static void main(String[] args) {
+//		OldRSABreaker rsa = new OldRSABreaker();
+//		rsa.setE(BigInteger.valueOf(5524331));
+//		rsa.setN(1177662719);
+//		System.out.println(rsa.getPhi());
+//	}
 
 }
